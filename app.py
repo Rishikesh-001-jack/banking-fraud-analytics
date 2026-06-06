@@ -1,13 +1,5 @@
-# app.py
-
 import streamlit as st
-import pandas as pd
-import plotly.express as px
-
-from utils.data_loader import (
-    load_processed_data,
-    get_kpi_summary
-)
+import os
 
 # ==========================================================
 # PAGE CONFIG
@@ -21,39 +13,20 @@ st.set_page_config(
 )
 
 # ==========================================================
-# CUSTOM CSS
+# LOAD CSS
 # ==========================================================
 
-st.markdown("""
-<style>
+def load_css():
+    css_file = "style.css"
 
-.main-header {
-    font-size:40px;
-    font-weight:bold;
-    color:#1E3A8A;
-}
+    if os.path.exists(css_file):
+        with open(css_file) as f:
+            st.markdown(
+                f"<style>{f.read()}</style>",
+                unsafe_allow_html=True
+            )
 
-.sub-header {
-    font-size:20px;
-    color:#6B7280;
-}
-
-.metric-card {
-    background-color:#F8FAFC;
-    padding:15px;
-    border-radius:10px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# ==========================================================
-# LOAD DATA
-# ==========================================================
-
-df = load_processed_data()
-
-kpis = get_kpi_summary(df)
+load_css()
 
 # ==========================================================
 # SIDEBAR
@@ -61,270 +34,91 @@ kpis = get_kpi_summary(df)
 
 with st.sidebar:
 
-    st.image(
-        "assets/logo.png",
-        use_container_width=True
-    )
+    logo_path = "assets/logo.png"
 
-    st.title("🏦 Fraud Intelligence")
+    try:
+
+        if os.path.exists(logo_path):
+            st.image(
+                logo_path,
+                use_container_width=True
+            )
+        else:
+            st.markdown(
+                """
+                # 🏦
+                ## Banking Fraud
+                ### Intelligence Platform
+                """
+            )
+
+    except Exception:
+
+        st.markdown(
+            """
+            # 🏦
+            ## Banking Fraud
+            ### Intelligence Platform
+            """
+        )
 
     st.markdown("---")
 
-    st.success("Navigation Available")
+    st.success("Analytics Modules")
 
     st.markdown("""
-### Pages
+    📊 Overview Dashboard
 
-📊 Overview Dashboard
+    🚨 Fraud Analysis
 
-🚨 Fraud Analysis
+    ⚠ Risk Segmentation
 
-⚠ Risk Segmentation
+    📈 Transaction Patterns
 
-📈 Transaction Patterns
+    🤖 AI Insights
 
-🤖 AI Insights
+    🧠 ML Predictions
 
-🧠 ML Predictions
+    📑 Executive Report
+    """)
 
-📑 Executive Report
+# ==========================================================
+# MAIN PAGE
+# ==========================================================
+
+st.title("🏦 Banking Fraud Intelligence Platform")
+
+st.markdown("""
+Advanced Banking Fraud Detection and Analytics System
+
+### Features
+- Fraud Detection Analytics
+- Risk Segmentation
+- Transaction Pattern Analysis
+- AI-Powered Insights
+- Machine Learning Predictions
+- Executive Reporting
 """)
 
-# ==========================================================
-# HEADER
-# ==========================================================
-
-st.markdown(
-    '<p class="main-header">🏦 Banking Fraud Intelligence Platform</p>',
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    '<p class="sub-header">Enterprise Fraud Detection, Risk Analytics and AI Insights</p>',
-    unsafe_allow_html=True
-)
-
-st.divider()
+st.markdown("---")
 
 # ==========================================================
-# KPI SECTION
+# DATA STATUS
 # ==========================================================
 
-col1, col2, col3, col4 = st.columns(4)
+data_path = "data/banking_transactions.csv"
 
-with col1:
-    st.metric(
-        "Transactions",
-        f"{kpis['total_transactions']:,}"
+if os.path.exists(data_path):
+
+    st.success(
+        "Dataset Loaded Successfully"
     )
-
-with col2:
-    st.metric(
-        "Fraud Cases",
-        f"{kpis['total_fraud']:,}"
-    )
-
-with col3:
-    st.metric(
-        "Fraud Rate",
-        f"{kpis['fraud_rate']}%"
-    )
-
-with col4:
-    st.metric(
-        "Total Volume",
-        f"₹ {kpis['total_amount']:,.0f}"
-    )
-
-st.divider()
-
-# ==========================================================
-# OVERVIEW CHARTS
-# ==========================================================
-
-col1, col2 = st.columns(2)
-
-with col1:
-
-    fraud_summary = pd.DataFrame({
-        "Category": ["Legitimate", "Fraud"],
-        "Count": [
-            len(df) - int(df["fraud_flag"].sum()),
-            int(df["fraud_flag"].sum())
-        ]
-    })
-
-    fig = px.pie(
-        fraud_summary,
-        names="Category",
-        values="Count",
-        hole=0.5,
-        title="Fraud Distribution"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
-with col2:
-
-    channel_df = (
-        df.groupby("payment_channel")
-        .size()
-        .reset_index(name="Transactions")
-    )
-
-    fig = px.bar(
-        channel_df,
-        x="payment_channel",
-        y="Transactions",
-        color="payment_channel",
-        title="Transactions by Payment Channel"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
-# ==========================================================
-# RISK OVERVIEW
-# ==========================================================
-
-st.subheader("⚠ Risk Overview")
-
-risk_df = (
-    df["risk_category"]
-    .value_counts()
-    .reset_index()
-)
-
-risk_df.columns = [
-    "Risk Category",
-    "Count"
-]
-
-fig = px.bar(
-    risk_df,
-    x="Risk Category",
-    y="Count",
-    color="Risk Category",
-    title="Risk Segmentation"
-)
-
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
-
-# ==========================================================
-# TOP FRAUD CHANNELS
-# ==========================================================
-
-st.subheader("🚨 Fraud by Payment Channel")
-
-fraud_channel = (
-    df.groupby("payment_channel")
-    ["fraud_flag"]
-    .sum()
-    .reset_index()
-)
-
-fig = px.bar(
-    fraud_channel,
-    x="payment_channel",
-    y="fraud_flag",
-    color="payment_channel",
-    title="Fraud Cases by Channel"
-)
-
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
-
-# ==========================================================
-# EXECUTIVE SUMMARY
-# ==========================================================
-
-st.subheader("📑 Executive Summary")
-
-fraud_rate = kpis["fraud_rate"]
-
-if fraud_rate < 2:
-    status = "Low Risk Environment"
-
-elif fraud_rate < 5:
-    status = "Moderate Risk Environment"
 
 else:
-    status = "High Risk Environment"
 
-st.info(f"""
-### Banking Fraud Intelligence Summary
-
-• Total Transactions: {kpis['total_transactions']:,}
-
-• Fraud Cases: {kpis['total_fraud']:,}
-
-• Fraud Rate: {fraud_rate}%
-
-• Average Device Risk Score: {kpis['avg_risk']}
-
-• Average Anomaly Score: {kpis['avg_anomaly']}
-
-• Current Status: {status}
-""")
-
-# ==========================================================
-# QUICK NAVIGATION
-# ==========================================================
-
-st.subheader("🚀 Analytics Modules")
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.success("""
-### Fraud Analysis
-
-- Fraud Trends
-- Fraud Channels
-- Fraud Heatmaps
-- Fraud KPIs
-""")
-
-with col2:
-    st.warning("""
-### Risk Analytics
-
-- Risk Segmentation
-- Device Risk
-- Velocity Analysis
-- Geo Risk
-""")
-
-with col3:
-    st.info("""
-### AI & ML
-
-- AI Insights
-- Fraud Prediction
-- Executive Reports
-- Risk Recommendations
-""")
-
-# ==========================================================
-# DATA PREVIEW
-# ==========================================================
-
-st.subheader("📋 Dataset Preview")
-
-st.dataframe(
-    df.head(20),
-    use_container_width=True
-)
+    st.error(
+        "Dataset not found: data/banking_transactions.csv"
+    )
 
 # ==========================================================
 # FOOTER
@@ -332,8 +126,6 @@ st.dataframe(
 
 st.markdown("---")
 
-st.caption("""
-Banking Fraud Intelligence Platform v1.0
-
-Built with Streamlit • Plotly • Scikit-Learn • Pandas
-""")
+st.caption(
+    "Banking Fraud Intelligence Platform © 2026"
+)
