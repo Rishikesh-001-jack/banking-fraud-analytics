@@ -1,1 +1,11 @@
-
+transaction_id,customer_id,transaction_timestamp,transaction_amount,payment_channel,authentication_type,device_risk_score,anomaly_score,transaction_velocity_score,geo_distance_km,merchant_category,customer_age,account_tenure_months,fraud_flag
+TXN0000001,CUST45821,2024-01-01 08:15:22,1250.50,UPI,OTP,22,18,15,2.5,Retail,34,48,0
+TXN0000002,CUST67214,2024-01-01 08:20:10,Credit Card,PIN,78,82,75,125.4,Electronics,45,96,1
+TXN0000003,CUST15892,2024-01-01 08:25:41,950.00,Debit Card,OTP,35,29,20,5.8,Food,29,24,0
+TXN0000004,CUST89345,2024-01-01 08:31:17,18250.75,Net Banking,Password,91,88,93,420.7,Travel,51,144,1
+TXN0000005,CUST22458,2024-01-01 08:40:55,499.99,Mobile Wallet,Biometric,14,12,10,1.1,Entertainment,22,12,0
+TXN0000006,CUST55124,2024-01-01 08:55:30,7850.25,UPI,2FA,67,70,64,85.2,Healthcare,38,60,1
+TXN0000007,CUST33219,2024-01-01 09:10:18,2500.00,Credit Card,OTP,30,28,25,10.5,Retail,41,72,0
+TXN0000008,CUST78411,2024-01-01 09:15:44,34200.00,Net Banking,Password,95,96,91,520.3,Travel,57,180,1
+TXN0000009,CUST11983,2024-01-01 09:20:27,1499.75,Debit Card,PIN,18,15,14,3.2,Food,31,36,0
+TXN0000010,CUST66752,2024-01-01 09:35:12,9200.50,UPI,OTP,72,68,74,110.8,Electronics,43,84,1
